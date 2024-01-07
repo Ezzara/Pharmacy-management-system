@@ -29,6 +29,7 @@
 						<thead>
 							<tr style="boder:1px solid black;">
 								<th>Name</th>
+								<th>Harga</th>
 								<th>Created date</th>
 								<th class="text-center action-btn">Actions</th>
 							</tr>
@@ -59,8 +60,14 @@
 					<div class="row form-row">
 						<div class="col-12">
 							<div class="form-group">
-								<label>Category</label>
+								<label>Nama Produk</label>
 								<input type="text" name="name" class="form-control">
+							</div>
+						</div>
+						<div class="col-12">
+							<div class="form-group">
+								<label>Harga</label>
+								<input type="number" name="price" class="form-control">
 							</div>
 						</div>
 					</div>
@@ -114,6 +121,7 @@
             ajax: "{{route('categories.index')}}",
             columns: [
                 {data: 'name', name: 'name'},
+				{data: 'price', name: 'price'},
                 {data: 'created_at',name: 'created_at'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]

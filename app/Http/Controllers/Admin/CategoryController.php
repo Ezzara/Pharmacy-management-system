@@ -22,6 +22,10 @@ class CategoryController extends Controller
             $categories = Category::get();
             return DataTables::of($categories)
                     ->addIndexColumn()
+                    ->addColumn('price',function($category){  
+                        $price = number_format($category->price,0,'.',',');            
+                        return settings('app_currency','$').' '. $price;
+                    })
                     ->addColumn('created_at',function($category){
                         return date_format(date_create($category->created_at),"d M,Y");
                     })
@@ -57,8 +61,13 @@ class CategoryController extends Controller
     {
         $this->validate($request,[
             'name'=>'required|max:100',
+            'price'=>'required|min:1',
         ]);
-        Category::create($request->all());
+        //Category::create($request->all());
+        Category::create([
+            'name'=>$request->name,
+            'price'=>$request->price,
+        ]);
         $notification=array("Category has been added");
         return back()->with($notification);
     }

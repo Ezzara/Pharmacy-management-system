@@ -97,8 +97,8 @@ class PurchaseController extends Controller
             'cost_price'=>'required|min:1',
             'quantity'=>'required|min:1',
             'expiry_date'=>'required',
-            'supplier'=>'required',
-            'image'=>'file|image|mimes:jpg,jpeg,png,gif',
+            //'supplier'=>'required',
+            //'image'=>'file|image|mimes:jpg,jpeg,png,gif',
         ]);
         $imageName = null;
         if($request->hasFile('image')){
@@ -108,7 +108,7 @@ class PurchaseController extends Controller
         Purchase::create([
             'product'=>$request->product,
             'category_id'=>$request->category,
-            'supplier_id'=>$request->supplier,
+            'supplier_id'=>1,
             'cost_price'=>$request->cost_price,
             'quantity'=>$request->quantity,
             'expiry_date'=>$request->expiry_date,
