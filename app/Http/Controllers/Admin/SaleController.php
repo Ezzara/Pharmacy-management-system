@@ -11,6 +11,7 @@ use App\Events\PurchaseOutStock;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use charlieuki\ReceiptPrinter\ReceiptPrinter;
 
 class SaleController extends Controller
 {
@@ -95,17 +96,25 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
+            // Initialize the receipt printer
+        $printer = new ReceiptPrinter;
+        $printer->init(config('receiptprinter.connector_type'), config('receiptprinter.connector_descriptor'));
+        $store_name = 'YOURMART';
+        $store_address = 'Mart Address';
+        $store_email = 'email';
+        $store_phone = '0213432';
+        $store_website = '5493534';
+        $mid = '123456';
+        $printer->setStore($mid, $store_name, $store_address, 
+                            $store_phone, $store_email, $store_website);
         // get the products data as a JSON string
         $productsJSON = $request->input('products');
         // decode the JSON string into an array
         $products = json_decode($productsJSON, true);
-       // dd($productsJSON);
         // loop through the products array and do something with each product
         foreach ($products as $product) {
             $sold_product = Category::find($product['product']);
-            //$purchased_item = Category::find($sold_product->purchase->id);
             $new_quantity = ($sold_product->quantity) - ($product['quantity']);
-            //dd($new_quantity);
             $sold_product->update([
                 'quantity'=>$new_quantity,
             ]);
@@ -117,8 +126,10 @@ class SaleController extends Controller
                 'quantity'=>$product['quantity'],
                 'total_price'=>$total,
             ]);
+            $printer->addItem($product['product'], $product['quantity'], $product['price'], $total);
         }
-        #return redirect()->route('sales.index')->with($notification);
+        $printer->printReceipt();
+
         return redirect()->route('sales.index');
     }
 
