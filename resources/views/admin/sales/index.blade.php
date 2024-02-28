@@ -62,7 +62,7 @@
             serverSide: true,
             ajax: "{{route('sales.index')}}",
             columns: [
-                {data: 'product', name: 'product'},
+                {data: 'category', name: 'category'},
                 {data: 'quantity', name: 'quantity'},
                 {data: 'total_price', name: 'total_price'},
 				{data: 'date', name: 'date'},

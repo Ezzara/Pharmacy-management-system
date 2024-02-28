@@ -30,12 +30,11 @@
 					<table id="purchase-table" class="datatable table table-hover table-center mb-0">
 						<thead>
 							<tr>
-								<th>Medicine Name</th>
-								<th>Category</th>
-								<th>Supplier</th>
-								<th>Purchase Cost</th>
-								<th>Quantity</th>
-								<th>Expire Date</th>
+								<th>Nama Obat</th>
+								<th>Jenis</th>
+								<th>Harga</th>
+								<th>Jumlah</th>
+								<th>Tanggal Exp</th>
 								<th class="action-btn">Action</th>
 							</tr>
 						</thead>
@@ -60,9 +59,8 @@
             serverSide: true,
             ajax: "{{route('purchases.index')}}",
             columns: [
-                {data: 'product', name: 'product'},
                 {data: 'category', name: 'category'},
-                {data: 'supplier', name: 'supplier'},
+				{data: 'type', name:'type'},
                 {data: 'cost_price', name: 'cost_price'},
                 {data: 'quantity', name: 'quantity'},
 				{data: 'expiry_date', name: 'expiry_date'},

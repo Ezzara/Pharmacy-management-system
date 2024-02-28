@@ -22,11 +22,27 @@ class CategoryController extends Controller
             $categories = Category::get();
             return DataTables::of($categories)
                     ->addIndexColumn()
+                    ->addColumn('price',function($category){  
+                        $price = number_format($category->price,0,'.',',');            
+                        return settings('app_currency','$').' '. $price;
+                    })
+                    ->addcolumn('quantity',function($category){
+                    //    $quantity = $category->quantity + $category->unit;
+                        $quantity = number_format($category->quantity,0);
+                        return $quantity.' '.$category->unit;
+                    })
+                    ->addcolumn('expiry_date',function($category){
+                        $exp = $category->expiry_date;
+                        if (!$category->expiry_date)
+                            $exp = "-";
+                        return $exp;
+                    })
                     ->addColumn('created_at',function($category){
                         return date_format(date_create($category->created_at),"d M,Y");
                     })
                     ->addColumn('action',function ($row){
-                        $editbtn = '<a data-id="'.$row->id.'" data-name="'.$row->name.'" href="javascript:void(0)" class="editbtn"><button class="btn btn-primary"><i class="fas fa-edit"></i></button></a>';
+                        $editbtn = '<a data-id="'.$row->id.'" data-name="'.$row->name.'" data-producer="'.$row->producer.'" data-type="'.$row->type.'" data-price="'.$row->price.'" data-unit="'.$row->unit.'" data-quantity="'.$row->quantity.
+                            '" data-expiry_date="'.$row->expiry_date.'" href="javascript:void(0)" class="editbtn"><button class="btn btn-primary"><i class="fas fa-edit"></i></button></a>';
                         $deletebtn = '<a data-id="'.$row->id.'" data-route="'.route('categories.destroy',$row->id).'" href="javascript:void(0)" id="deletebtn"><button class="btn btn-danger"><i class="fas fa-trash"></i></button></a>';
                         if(!auth()->user()->hasPermissionTo('edit-category')){
                             $editbtn = '';
@@ -57,8 +73,20 @@ class CategoryController extends Controller
     {
         $this->validate($request,[
             'name'=>'required|max:100',
+            'price'=>'required|min:1',
+            'producer'=>'required',
+            'type'=>'required',
+            'unit'=>'required',
+            
         ]);
-        Category::create($request->all());
+        //Category::create($request->all());
+        Category::create([
+            'name'=>$request->name,
+            'price'=>$request->price,
+            'producer'=>$request->producer,
+            'type'=>$request->type,
+            'unit'=>$request->unit,
+        ]);
         $notification=array("Category has been added");
         return back()->with($notification);
     }
@@ -75,10 +103,25 @@ class CategoryController extends Controller
      */
     public function update(Request $request)
     {
-        $this->validate($request,['name'=>'required|max:100']);
+        $this->validate($request,[
+            'name'=>'required|max:100',
+            'producer'=>'required',
+            'type'=>'required',
+            'price'=>'required',
+            'quantity'=>'required',
+            'unit'=>'required',
+            'expiry_date'=>'required',
+        ]);
+        //dd($request->producer);
         $category = Category::find($request->id);
         $category->update([
             'name'=>$request->name,
+            'producer'=>$request->producer,
+            'type'=>$request->type,
+            'price'=>$request->price,
+            'quantity'=>$request->quantity,
+            'unit'=>$request->unit,
+            'expiry_date'=>$request->expiry_date,
         ]);
         $notification = notify("Category has been updated");
         return back()->with($notification);

@@ -29,26 +29,10 @@
 						<div class="row">
 							<div class="col-lg-4">
 								<div class="form-group">
-									<label>Medicine Name<span class="text-danger">*</span></label>
-									<input class="form-control" type="text" name="product" >
-								</div>
-							</div>
-							<div class="col-lg-4">
-								<div class="form-group">
 									<label>Category <span class="text-danger">*</span></label>
 									<select class="select2 form-select form-control" name="category"> 
 										@foreach ($categories as $category)
 											<option value="{{$category->id}}">{{$category->name}}</option>
-										@endforeach
-									</select>
-								</div>
-							</div>
-							<div class="col-lg-4">
-								<div class="form-group">
-									<label>Supplier <span class="text-danger">*</span></label>
-									<select class="select2 form-select form-control" name="supplier"> 
-										@foreach ($suppliers as $supplier)
-											<option value="{{$supplier->id}}">{{$supplier->name}}</option>
 										@endforeach
 									</select>
 								</div>
@@ -79,12 +63,6 @@
 								<div class="form-group">
 									<label>Expire Date<span class="text-danger">*</span></label>
 									<input class="form-control" type="date" name="expiry_date">
-								</div>
-							</div>
-							<div class="col-lg-6">
-								<div class="form-group">
-									<label>Medicine Image</label>
-									<input type="file" name="image" class="form-control">
 								</div>
 							</div>
 						</div>

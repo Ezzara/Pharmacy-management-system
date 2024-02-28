@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Sale;
 use App\Models\Product;
+use App\Models\Category;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
 use App\Events\PurchaseOutStock;
@@ -38,6 +39,11 @@ class SaleController extends Controller
                             return $sale->product->purchase->product. ' ' . $image;
                         }                 
                     })
+                    ->addColumn('category',function($purchase){
+                        if(!empty($purchase->category)){
+                            return $purchase->category->name;
+                        }
+                    })
                     ->addColumn('total_price',function($sale){                   
                         return settings('app_currency','$').' '. $sale->total_price;
                     })
@@ -60,9 +66,9 @@ class SaleController extends Controller
                     ->make(true);
 
         }
-        $products = Product::get();
+        $categories = Category::get();
         return view('admin.sales.index',compact(
-            'title','products',
+            'title','categories',
         ));
     }
 
@@ -75,8 +81,9 @@ class SaleController extends Controller
     {
         $title = 'create sales';
         $products = Product::get();
+        $categories = Category::get();
         return view('admin.sales.create',compact(
-            'title','products'
+            'title','products','categories'
         ));
     }
 
@@ -88,47 +95,31 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request,[
-            'product'=>'required',
-            'quantity'=>'required|integer|min:1'
-        ]);
-        $sold_product = Product::find($request->product);
-        
-        /**update quantity of
-            sold item from
-         purchases
-        **/
-        $purchased_item = Purchase::find($sold_product->purchase->id);
-        $new_quantity = ($purchased_item->quantity) - ($request->quantity);
-        $notification = '';
-        if (!($new_quantity < 0)){
-
-            $purchased_item->update([
+        // get the products data as a JSON string
+        $productsJSON = $request->input('products');
+        // decode the JSON string into an array
+        $products = json_decode($productsJSON, true);
+       // dd($productsJSON);
+        // loop through the products array and do something with each product
+        foreach ($products as $product) {
+            $sold_product = Category::find($product['product']);
+            //$purchased_item = Category::find($sold_product->purchase->id);
+            $new_quantity = ($sold_product->quantity) - ($product['quantity']);
+            //dd($new_quantity);
+            $sold_product->update([
                 'quantity'=>$new_quantity,
             ]);
-
-            /**
-             * calcualting item's total price
-            **/
-            $total_price = ($request->quantity) * ($sold_product->price);
+            // your logic here
+            $total = $product['price'] * $product['quantity'];
             Sale::create([
-                'product_id'=>$request->product,
-                'quantity'=>$request->quantity,
-                'total_price'=>$total_price,
+                
+                'category_id'=>$product['product'],
+                'quantity'=>$product['quantity'],
+                'total_price'=>$total,
             ]);
-
-            $notification = notify("Product has been sold");
-        } 
-        if($new_quantity <=1 && $new_quantity !=0){
-            // send notification 
-            $product = Purchase::where('quantity', '<=', 1)->first();
-            event(new PurchaseOutStock($product));
-            // end of notification 
-            $notification = notify("Product is running out of stock!!!");
-            
         }
-
-        return redirect()->route('sales.index')->with($notification);
+        #return redirect()->route('sales.index')->with($notification);
+        return redirect()->route('sales.index');
     }
 
     

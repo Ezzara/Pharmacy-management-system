@@ -25,15 +25,6 @@ class PurchaseController extends Controller
         if($request->ajax()){
             $purchases = Purchase::get();
             return DataTables::of($purchases)
-                ->addColumn('product',function($purchase){
-                    $image = '';
-                    if(!empty($purchase->image)){
-                        $image = '<span class="avatar avatar-sm mr-2">
-						<img class="avatar-img" src="'.asset("storage/purchases/".$purchase->image).'" alt="product">
-					    </span>';
-                    }                 
-                    return $purchase->product.' ' . $image;
-                })
                 ->addColumn('category',function($purchase){
                     if(!empty($purchase->category)){
                         return $purchase->category->name;
@@ -42,8 +33,8 @@ class PurchaseController extends Controller
                 ->addColumn('cost_price',function($purchase){
                     return settings('app_currency','$'). ' '. $purchase->cost_price;
                 })
-                ->addColumn('supplier',function($purchase){
-                    return $purchase->supplier->name;
+                ->addColumn('type',function($purchase){
+                    return $purchase->category->type;
                 })
                 ->addColumn('expiry_date',function($purchase){
                     return date_format(date_create($purchase->expiry_date),'d M, Y');
@@ -92,13 +83,10 @@ class PurchaseController extends Controller
     public function store(Request $request)
     {
         $this->validate($request,[
-            'product'=>'required|max:200',
             'category'=>'required',
             'cost_price'=>'required|min:1',
             'quantity'=>'required|min:1',
             'expiry_date'=>'required',
-            'supplier'=>'required',
-            'image'=>'file|image|mimes:jpg,jpeg,png,gif',
         ]);
         $imageName = null;
         if($request->hasFile('image')){
@@ -106,14 +94,20 @@ class PurchaseController extends Controller
             $request->image->move(public_path('storage/purchases'), $imageName);
         }
         Purchase::create([
-            'product'=>$request->product,
             'category_id'=>$request->category,
-            'supplier_id'=>$request->supplier,
+            #'supplier_id'=>'test',
             'cost_price'=>$request->cost_price,
             'quantity'=>$request->quantity,
             'expiry_date'=>$request->expiry_date,
             'image'=>$imageName,
         ]);
+        $category = Category::find($request->category);
+        $old_quantity = $category->quantity;
+        $category->update([
+            'expiry_date'=>$request->expiry_date,
+            'quantity'=>$category->quantity + $request->quantity,
+        ]);
+
         $notifications = notify("Purchase has been added");
         return redirect()->route('purchases.index')->with($notifications);
     }
@@ -146,13 +140,10 @@ class PurchaseController extends Controller
     public function update(Request $request, Purchase $purchase)
     {
         $this->validate($request,[
-            'product'=>'required|max:200',
             'category'=>'required',
             'cost_price'=>'required|min:1',
             'quantity'=>'required|min:1',
             'expiry_date'=>'required',
-            'supplier'=>'required',
-            'image'=>'file|image|mimes:jpg,jpeg,png,gif',
         ]);
         $imageName = $purchase->image;
         if($request->hasFile('image')){
@@ -160,13 +151,10 @@ class PurchaseController extends Controller
             $request->image->move(public_path('storage/purchases'), $imageName);
         }
         $purchase->update([
-            'product'=>$request->product,
             'category_id'=>$request->category,
-            'supplier_id'=>$request->supplier,
             'cost_price'=>$request->cost_price,
             'quantity'=>$request->quantity,
             'expiry_date'=>$request->expiry_date,
-            'image'=>$imageName,
         ]);
         $notifications = notify("Purchase has been updated");
         return redirect()->route('purchases.index')->with($notifications);

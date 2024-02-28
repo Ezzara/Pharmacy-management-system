@@ -31,16 +31,16 @@
                         <table id="purchase-table" class="datatable table table-hover table-center mb-0">
                             <thead>
                                 <tr>
-                                    <th>Medicine Name</th>
-                                    <th>Category</th>
-                                    <th>Supplier</th>
-                                    <th>Purchase Cost</th>
-                                    <th>Quantity</th>
-                                    <th>Expire Date</th>                                </tr>
+                                    <th>Nama Obat</th>
+                                    <th>Jenis</th>
+                                    <th>Harga</th>
+                                    <th>Jumlah</th>
+                                    <th>Tanggal Exp</th>     
+                                </tr>
                             </thead>
                             <tbody>
                             @foreach ($purchases as $purchase)
-                                @if(!empty($purchase->supplier) && !empty($purchase->category))
+                                @if(!empty($purchase->category_id))
                                 <tr>
                                     <td>
                                         <h2 class="table-avatar">
@@ -49,13 +49,12 @@
                                                 <img class="avatar-img" src="{{asset('storage/purchases/'.$purchase->image)}}" alt="product image">
                                             </span>
                                             @endif
-                                            {{$purchase->product}}
+                                            {{$purchase->category->name}}
                                         </h2>
                                     </td>
-                                    <td>{{$purchase->category->name}}</td>
-                                    <td>{{AppSettings::get('app_currency', '$')}}{{$purchase->price}}</td>
+                                    <td>{{$purchase->category->type}}</td>
+                                    <td>{{AppSettings::get('app_currency', '$')}}{{$purchase->cost_price}}</td>
                                     <td>{{$purchase->quantity}}</td>
-                                    <td>{{$purchase->supplier->name}}</td>
                                     <td>{{date_format(date_create($purchase->expiry_date),"d M, Y")}}</td>
                                 </tr>
                                 @endif

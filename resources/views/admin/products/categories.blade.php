@@ -28,8 +28,12 @@
 					<table id="category-table" class="datatable table table-striped table-bordered table-hover table-center mb-0">
 						<thead>
 							<tr style="boder:1px solid black;">
-								<th>Name</th>
-								<th>Created date</th>
+								<th>Nama Obat</th>
+								<th>Produsen</th>
+								<th>Jenis</th>
+								<th>Harga</th>
+								<th>Stock</th>
+								<th>Tgl Expired</th>
 								<th class="text-center action-btn">Actions</th>
 							</tr>
 						</thead>
@@ -59,8 +63,16 @@
 					<div class="row form-row">
 						<div class="col-12">
 							<div class="form-group">
-								<label>Category</label>
+								<label>Nama Produk</label>
 								<input type="text" name="name" class="form-control">
+								<label>Producer</label>
+								<input type="text" name="producer" class="form-control">
+								<label>Jenis</label>
+								<input type="text" name="type" class="form-control">
+								<label>Jenis Satuan</label>
+								<input type="text" name="unit" class="form-control">
+								<label>Harga</label>
+								<input type="number" name="price" class="form-control">
 							</div>
 						</div>
 					</div>
@@ -90,8 +102,20 @@
 						<div class="col-12">
 							<input type="hidden" name="id" id="edit_id">
 							<div class="form-group">
-								<label>Category</label>
+								<label>Nama Obat</label>
 								<input type="text" class="form-control edit_name" name="name">
+								<label>Produsen</label>
+								<input type="text" class="form-control edit_producer" name="producer">
+								<label>Jenis</label>
+								<input type="text" class="form-control edit_type" name="type">
+								<label>Harga</label>
+								<input type="number" class="form-control edit_price" name="price">
+								<label>Stock</label>
+								<input type="number" class="form-control edit_quantity" name="quantity">
+								<label>Unit</label>
+								<input type="text" class="form-control edit_unit" name="unit">
+								<label>Tgl Expired</label>
+								<input type="date" class="form-control edit_expiry_date" name="expiry_date">
 							</div>
 						</div>
 						
@@ -114,7 +138,11 @@
             ajax: "{{route('categories.index')}}",
             columns: [
                 {data: 'name', name: 'name'},
-                {data: 'created_at',name: 'created_at'},
+                {data: 'producer',name: 'producer'},
+				{data: 'type',name:'type'},
+				{data: 'price',name:'price'},
+				{data: 'quantity',name:'quantity'},
+				{data: 'expiry_date',name:'expiry_date'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
@@ -122,8 +150,21 @@
             $('#edit_category').modal('show');
             var id = $(this).data('id');
             var name = $(this).data('name');
+			var producer = $(this).data('producer');
+			var type = $(this).data('type');
+			var price = $(this).data('price');
+			var quantity = $(this).data('quantity');
+			var unit = $(this).data('unit');
+			var expiry_date = $(this).data('expiry_date');
+
             $('#edit_id').val(id);
             $('.edit_name').val(name);
+			$('.edit_producer').val(producer);
+			$('.edit_type').val(type);
+			$('.edit_price').val(price);
+			$('.edit_quantity').val(quantity);
+			$('.edit_unit').val(unit);
+			$('.edit_expiry_date').val(expiry_date);
         });
         //
     });

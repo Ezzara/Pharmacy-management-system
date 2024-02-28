@@ -40,10 +40,10 @@
                             </thead>
                             <tbody>
                                 @foreach ($sales as $sale)
-                                    @if (!(empty($sale->product->purchase)))
+                                    @if (!(empty($sale->category_id)))
                                         <tr>
                                             <td>
-                                                {{$sale->product->purchase->product}}
+                                                {{$sale->category->name}}
                                                 @if (!empty($sale->product->purchase->image))
                                                     <span class="avatar avatar-sm mr-2">
                                                     <img class="avatar-img" src="{{asset("storage/purchases/".$sale->product->purchase->image)}}" alt="image">
