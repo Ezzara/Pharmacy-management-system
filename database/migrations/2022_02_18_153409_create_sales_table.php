@@ -16,8 +16,6 @@ class CreateSalesTable extends Migration
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
             $table->foreignId('category_id')->nullable()->constrained()->onDelete('cascade');
-            #transaction id
-            #$table->foreignId('transaction_id')->nullable()->constrained()->onDelete('cascade');
             $table->integer('quantity');
             $table->decimal('total_price');
             $table->softDeletes();

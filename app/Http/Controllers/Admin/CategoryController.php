@@ -35,7 +35,7 @@ class CategoryController extends Controller
                         $exp = $category->expiry_date;
                         if (!$category->expiry_date)
                             $exp = "-";
-                        return $exp;
+                        return date_format(date_create($exp),"d M,Y");
                     })
                     ->addColumn('created_at',function($category){
                         return date_format(date_create($category->created_at),"d M,Y");
@@ -74,8 +74,6 @@ class CategoryController extends Controller
         $this->validate($request,[
             'name'=>'required|max:100',
             'price'=>'required|min:1',
-            'producer'=>'required',
-            'type'=>'required',
             'unit'=>'required',
             
         ]);
@@ -83,8 +81,6 @@ class CategoryController extends Controller
         Category::create([
             'name'=>$request->name,
             'price'=>$request->price,
-            'producer'=>$request->producer,
-            'type'=>$request->type,
             'unit'=>$request->unit,
         ]);
         $notification=array("Category has been added");
@@ -105,8 +101,6 @@ class CategoryController extends Controller
     {
         $this->validate($request,[
             'name'=>'required|max:100',
-            'producer'=>'required',
-            'type'=>'required',
             'price'=>'required',
             'quantity'=>'required',
             'unit'=>'required',
@@ -116,8 +110,6 @@ class CategoryController extends Controller
         $category = Category::find($request->id);
         $category->update([
             'name'=>$request->name,
-            'producer'=>$request->producer,
-            'type'=>$request->type,
             'price'=>$request->price,
             'quantity'=>$request->quantity,
             'unit'=>$request->unit,

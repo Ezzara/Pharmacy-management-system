@@ -15,9 +15,7 @@ class CreatePurchasesTable extends Migration
     {
         Schema::create('purchases', function (Blueprint $table) {
             $table->id();
-            $table->string('product');
             $table->foreignId('category_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('supplier_id')->nullable()->constrained()->onDelete('cascade');
             $table->decimal('cost_price')->nullable();
             #change quantity into decimal
             $table->decimal('quantity')->nullable();

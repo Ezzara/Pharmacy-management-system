@@ -16,10 +16,11 @@ class CreateCategoriesTable extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('producer');
-            $table->string('type');
-            $table->decimal('price')->nullable();
-            $table->string('unit');
+            //producer and type maybe used later
+            $table->string('producer')->nullable();
+            $table->string('type')->nullable();
+            $table->decimal('price')->nullable()->default(0);
+            $table->string('unit')->default('strip');
             $table->decimal('quantity')->nullable()->default(0);
             $table->string('expiry_date')->nullable();
             $table->timestamps();

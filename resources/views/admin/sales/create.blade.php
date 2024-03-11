@@ -7,10 +7,10 @@
 
 @push('page-header')
 <div class="col-sm-12">
-	<h3 class="page-title">Edit Sale</h3>
+	<h3 class="page-title">Kasir</h3>
 	<ul class="breadcrumb">
 		<li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
-		<li class="breadcrumb-item active">Edit Sale</li>
+		<li class="breadcrumb-item active">Kasir</li>
 	</ul>
 </div>
 @endpush

@@ -8,14 +8,14 @@
 
 @push('page-header')
 <div class="col-sm-7 col-auto">
-	<h3 class="page-title">Categories</h3>
+	<h3 class="page-title">Daftar Obat</h3>
 	<ul class="breadcrumb">
 		<li class="breadcrumb-item"><a href="{{route('dashboard')}}">Dashboard</a></li>
-		<li class="breadcrumb-item active">Categories</li>
+		<li class="breadcrumb-item active">Daftar Obat</li>
 	</ul>
 </div>
 <div class="col-sm-5 col">
-	<a href="#add_categories" data-toggle="modal" class="btn btn-primary float-right mt-2">Add Category</a>
+	<a href="#add_categories" data-toggle="modal" class="btn btn-primary float-right mt-2">Tambah</a>
 </div>
 @endpush
 
@@ -29,8 +29,6 @@
 						<thead>
 							<tr style="boder:1px solid black;">
 								<th>Nama Obat</th>
-								<th>Produsen</th>
-								<th>Jenis</th>
 								<th>Harga</th>
 								<th>Stock</th>
 								<th>Tgl Expired</th>
@@ -65,10 +63,6 @@
 							<div class="form-group">
 								<label>Nama Produk</label>
 								<input type="text" name="name" class="form-control">
-								<label>Producer</label>
-								<input type="text" name="producer" class="form-control">
-								<label>Jenis</label>
-								<input type="text" name="type" class="form-control">
 								<label>Jenis Satuan</label>
 								<input type="text" name="unit" class="form-control">
 								<label>Harga</label>
@@ -104,10 +98,6 @@
 							<div class="form-group">
 								<label>Nama Obat</label>
 								<input type="text" class="form-control edit_name" name="name">
-								<label>Produsen</label>
-								<input type="text" class="form-control edit_producer" name="producer">
-								<label>Jenis</label>
-								<input type="text" class="form-control edit_type" name="type">
 								<label>Harga</label>
 								<input type="number" class="form-control edit_price" name="price">
 								<label>Stock</label>
@@ -138,8 +128,6 @@
             ajax: "{{route('categories.index')}}",
             columns: [
                 {data: 'name', name: 'name'},
-                {data: 'producer',name: 'producer'},
-				{data: 'type',name:'type'},
 				{data: 'price',name:'price'},
 				{data: 'quantity',name:'quantity'},
 				{data: 'expiry_date',name:'expiry_date'},

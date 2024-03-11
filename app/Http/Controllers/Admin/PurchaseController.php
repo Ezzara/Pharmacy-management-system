@@ -95,7 +95,6 @@ class PurchaseController extends Controller
         }
         Purchase::create([
             'category_id'=>$request->category,
-            #'supplier_id'=>'test',
             'cost_price'=>$request->cost_price,
             'quantity'=>$request->quantity,
             'expiry_date'=>$request->expiry_date,
