@@ -35,7 +35,9 @@ class CategoryController extends Controller
                         $exp = $category->expiry_date;
                         if (!$category->expiry_date)
                             $exp = "-";
-                        return date_format(date_create($exp),"d M,Y");
+                        else
+                            $exp = date_format(date_create($exp),"d M,Y");
+                        return $exp;
                     })
                     ->addColumn('created_at',function($category){
                         return date_format(date_create($category->created_at),"d M,Y");

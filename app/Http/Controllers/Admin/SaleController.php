@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use charlieuki\ReceiptPrinter\ReceiptPrinter;
 
+//require 'vendor/autoload.php';
+use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+use Mike42\Escpos\Printer;
+
 class SaleController extends Controller
 {
     /**
@@ -96,29 +100,22 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
-            // Initialize the receipt printer
-        $printer = new ReceiptPrinter;
-        $printer->init(config('receiptprinter.connector_type'), config('receiptprinter.connector_descriptor'));
-        $store_name = 'YOURMART';
-        $store_address = 'Mart Address';
-        $store_email = 'email';
-        $store_phone = '0213432';
-        $store_website = '5493534';
-        $mid = '123456';
-        $printer->setStore($mid, $store_name, $store_address, 
-                            $store_phone, $store_email, $store_website);
         // get the products data as a JSON string
         $productsJSON = $request->input('products');
         // decode the JSON string into an array
         $products = json_decode($productsJSON, true);
+
+
+
+
         // loop through the products array and do something with each product
         foreach ($products as $product) {
             $sold_product = Category::find($product['product']);
+            dd($this->generateAcronym($sold_product->name));
             $new_quantity = ($sold_product->quantity) - ($product['quantity']);
             $sold_product->update([
                 'quantity'=>$new_quantity,
             ]);
-            // your logic here
             $total = $product['price'] * $product['quantity'];
             Sale::create([
                 
@@ -126,10 +123,49 @@ class SaleController extends Controller
                 'quantity'=>$product['quantity'],
                 'total_price'=>$total,
             ]);
-            $printer->addItem($product['product'], $product['quantity'], $product['price'], $total);
         }
-        $printer->printReceipt();
+        
+        try {
 
+            $connector = new WindowsPrintConnector("POS58 Printer");
+            $printer = new Printer($connector);
+            
+            // Print header
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("Apotek\n");
+            $printer->text("Padmasari\n");
+            $printer->text("kd transaksi\n");
+        
+            // Print transaction details
+            $printer->text("\n");
+            $printer->text("Transaction ID: {000}\n\n");
+            $printer->setJustification(Printer::JUSTIFY_LEFT);
+            $subtotal = 0;
+            foreach ($products as $product) {
+                $sold_product = Category::find($product['product']);
+                $total = $product['price'] * $product['quantity'];
+                #abbr the product name
+                $abbreviation = preg_replace('/\b(\w)|./', '$1', $sold_product->name);
+                $printer->text("{$abbreviation} \n ({$product['quantity']} x {$product['price']})\n");
+                $subtotal = $subtotal + $product['quantity'] * $product['price'];
+            }
+
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            // Print subtotal, tax, and total
+            $printer->text("Total: {$subtotal}\n\n");
+            
+            // Print footer
+            $printer->text("Terima Kasih Telah Berbelanja!\n");
+        
+            // Cut the receipt
+            $printer->cut();
+        
+            // Close the printer connection
+            $printer->close();
+        } catch (Exception $e) {
+            // Handle any exceptions (e.g., printer not found)
+            echo "Error: " . $e->getMessage();
+        }
         return redirect()->route('sales.index');
     }
 
@@ -245,4 +281,44 @@ class SaleController extends Controller
     {
         return Sale::findOrFail($request->id)->delete();
     }
+    /*
+    function ticket_number() {
+        do {
+            $number = random_int(1000000, 9999999);
+        } while (Sale::where("number", "=", $number)->first());
+    
+        return $number;
+    }
+    */
+    public function generateRandomNumericString($length = 6)
+    {
+        $characters = '0123456789'; // Digits only
+
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, strlen($characters) - 1)];
+        }
+
+        return $randomString;
+    }
+
+    function generateAcronym($input)
+    {
+        $words = explode(' ', $input);
+        $result = [];
+    
+        foreach ($words as $word) {
+            // Keep the first 3 letters unchanged
+            $prefix = substr($word, 0, 2);
+    
+            // Remove vowels after the third letter
+            $suffix = preg_replace('/[aeiou]/i', '', substr($word, 2));
+    
+            // Combine the modified parts
+            $result[] = $prefix . $suffix;
+        }
+    
+        return implode(' ', $result);
+    }
+
 }

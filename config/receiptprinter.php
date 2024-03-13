@@ -19,7 +19,7 @@ return [
     | Typically printer name or IP address.
     |
     */
-    'connector_descriptor' => 'POS80 Printer',
+    'connector_descriptor' => 'POS58 Printer',
     /*
     |--------------------------------------------------------------------------
     | Printer port
