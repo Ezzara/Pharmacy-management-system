@@ -29,6 +29,12 @@ use App\Http\Controllers\Admin\SupplierController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/', function() {
+    return view('admin/login');
+});
+Route::get('/home', function() {
+    return redirect()->route('dashboard');
+});
 Route::middleware(['auth'])->group(function(){
     Route::get('dashboard',[DashboardController::class,'index'])->name('dashboard');
     Route::get('',[DashboardController::class,'Index']);
