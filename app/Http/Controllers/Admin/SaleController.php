@@ -111,7 +111,7 @@ class SaleController extends Controller
         // loop through the products array and do something with each product
         foreach ($products as $product) {
             $sold_product = Category::find($product['product']);
-            dd($this->generateAcronym($sold_product->name));
+            $this->generateAcronym($sold_product->name);
             $new_quantity = ($sold_product->quantity) - ($product['quantity']);
             $sold_product->update([
                 'quantity'=>$new_quantity,
@@ -132,28 +132,32 @@ class SaleController extends Controller
             
             // Print header
             $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->text("Apotek\n");
-            $printer->text("Padmasari\n");
-            $printer->text("kd transaksi\n");
-        
+            $printer->text("APOTEK\n");
+            $printer->text("PADMASARI\n");
+            #$printer->text("alamat");
+            $tid = $this->generateRandomNumericString();
             // Print transaction details
-            $printer->text("\n");
-            $printer->text("Transaction ID: {000}\n\n");
             $printer->setJustification(Printer::JUSTIFY_LEFT);
-            $subtotal = 0;
+            $printer->text("\n");
+            $printer->text("tid:{$tid}\n\n");
+            $total = 0;
             foreach ($products as $product) {
+                $subtotal = 0;
                 $sold_product = Category::find($product['product']);
-                $total = $product['price'] * $product['quantity'];
                 #abbr the product name
-                $abbreviation = preg_replace('/\b(\w)|./', '$1', $sold_product->name);
-                $printer->text("{$abbreviation} \n ({$product['quantity']} x {$product['price']})\n");
-                $subtotal = $subtotal + $product['quantity'] * $product['price'];
+                $abbreviation = $this->generateAcronym($sold_product->name);
+                $printer->text("{$abbreviation} \n");
+                $printer->setJustification(Printer::JUSTIFY_RIGHT);
+                $printer->text("{$product['quantity']} x Rp{$product['price']} = ");
+                $subtotal = $product['quantity'] * $product['price'];
+                $total = $total + $subtotal; 
+                $printer->text("Rp{$subtotal}\n");
+                $printer->setJustification(Printer::JUSTIFY_LEFT);
             }
-
-            $printer->setJustification(Printer::JUSTIFY_CENTER);
             // Print subtotal, tax, and total
-            $printer->text("Total: {$subtotal}\n\n");
-            
+            $printer->setJustification(Printer::JUSTIFY_RIGHT);
+            $printer->text("Total: Rp{$total}\n\n");
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
             // Print footer
             $printer->text("Terima Kasih Telah Berbelanja!\n");
         
@@ -290,7 +294,7 @@ class SaleController extends Controller
         return $number;
     }
     */
-    public function generateRandomNumericString($length = 6)
+    public function generateRandomNumericString($length = 5)
     {
         $characters = '0123456789'; // Digits only
 
