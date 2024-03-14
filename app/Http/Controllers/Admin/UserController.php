@@ -80,7 +80,7 @@ class UserController extends Controller
     {
         $this->validate($request,[
             'name'=>'required|max:100',
-            'email'=>'required|email',
+            'email'=>'required',
             'role'=>'required',
             'password'=>'required|confirmed|max:200',
             'avatar'=>'nullable|file|image|mimes:jpg,jpeg,gif,png',
@@ -129,7 +129,7 @@ class UserController extends Controller
     {
         $this->validate($request,[
             'name'=>'required|max:100',
-            'email'=>'required|email',
+            'email'=>'required',
             'role'=>'required',
             'password'=>'nullable|confirmed|max:200',
             'avatar'=>'nullable|file|image|mimes:jpg,jpeg,gif,png',

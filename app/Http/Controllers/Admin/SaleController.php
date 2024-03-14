@@ -134,7 +134,7 @@ class SaleController extends Controller
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("APOTEK\n");
             $printer->text("PADMASARI\n");
-            #$printer->text("alamat");
+            $printer->text("WA:0852-1318-6007\n");
             $tid = $this->generateRandomNumericString();
             // Print transaction details
             $printer->setJustification(Printer::JUSTIFY_LEFT);
