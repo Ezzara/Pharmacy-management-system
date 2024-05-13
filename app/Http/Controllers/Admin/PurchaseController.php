@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Category;
 use App\Models\Purchase;
-use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
@@ -68,9 +67,8 @@ class PurchaseController extends Controller
     {
         $title = 'create purchase';
         $categories = Category::get();
-        $suppliers = Supplier::get();
         return view('admin.purchases.create',compact(
-            'title','categories','suppliers'
+            'title','categories',
         ));
     }
 
@@ -123,9 +121,8 @@ class PurchaseController extends Controller
     {
         $title = 'edit purchase';
         $categories = Category::get();
-        $suppliers = Supplier::get();
         return view('admin.purchases.edit',compact(
-            'title','purchase','categories','suppliers'
+            'title','purchase','categories',
         ));
     }
 

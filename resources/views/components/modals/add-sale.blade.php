@@ -16,7 +16,7 @@
                             <div class="form-group">
                                 <label>Product <span class="text-danger">*</span></label>
                                 <select class="select2 form-select form-control" name="product"> 
-                                    @foreach (\App\Models\Product::get() as $product)
+                                    @foreach (\App\Models\Category::get() as $product)
                                         @if (!empty($product->purchase))
                                             @if (!($product->purchase->quantity <= 0))
                                                 <option value="{{$product->id}}">{{$product->purchase->product}}</option>

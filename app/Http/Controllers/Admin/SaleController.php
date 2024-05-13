@@ -85,10 +85,9 @@ class SaleController extends Controller
     public function create()
     {
         $title = 'create sales';
-        $products = Product::get();
         $categories = Category::get();
         return view('admin.sales.create',compact(
-            'title','products','categories'
+            'title','categories'
         ));
     }
 
