@@ -28,6 +28,8 @@
     <!-- Main CSS -->
     <link rel="stylesheet" href="{{asset('assets/css/style.css')}}">
     <!-- Page CSS -->
+    <link rel="stylesheet" href="{{asset('assets/css/custom-datatables.css') }}">
+    <!-- Custom Datatable-->
     @stack('page-css')
     <!--[if lt IE 9]>
         <script src="assets/js/html5shiv.min.js"></script>

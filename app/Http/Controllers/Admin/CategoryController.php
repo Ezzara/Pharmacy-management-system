@@ -17,9 +17,11 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
+        //dd($request->all());
         $title = 'categories';
         if($request->ajax()){
-            $categories = Category::get();
+
+            $categories = Category::query();
             return DataTables::of($categories)
                     ->addIndexColumn()
                     ->addColumn('price',function($category){  
@@ -56,6 +58,11 @@ class CategoryController extends Controller
                         return $btn;
                     })
                     ->rawColumns(['action'])
+                    ->filter(function ($query) use ($request) {
+                        if ($request->has('stock_status') && $request->get('stock_status') == 'in_stock') {
+                            $query->where('quantity', '>', 0);
+                        }
+                    })
                     ->make(true);
         }
         return view('admin.products.categories',compact(

@@ -25,6 +25,10 @@
 		<div class="card">
 			<div class="card-body">
 				<div class="table-responsive">
+				<select id="stock_status">
+					<option value="">All</option>
+					<option value="in_stock">In Stock</option>
+				</select>
 					<table id="category-table" class="datatable table table-striped table-bordered table-hover table-center mb-0">
 						<thead>
 							<tr style="boder:1px solid black;">
@@ -125,7 +129,13 @@
         var table = $('#category-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{route('categories.index')}}",
+            ajax: {
+				url: "{{route('categories.index')}}",
+				data: function (d) {
+					d.stock_status = $('#stock_status').val();
+				}
+			},
+			pageLength: 100,
             columns: [
                 {data: 'name', name: 'name'},
 				{data: 'price',name:'price'},
@@ -133,6 +143,9 @@
 				{data: 'expiry_date',name:'expiry_date'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
+			//data: function (d) {
+			//	d.stock_status = $('#stock_status').val();
+			//}
         });
         $('#category-table').on('click','.editbtn',function (){
             $('#edit_category').modal('show');
@@ -154,7 +167,11 @@
 			$('.edit_unit').val(unit);
 			$('.edit_expiry_date').val(expiry_date);
         });
-        //
+        
+		$('#stock_status').on('change', function() {
+			console.log($('#stock_status').val()); // Add this line
+        	table.draw();
+        });
     });
 	// QET of the first instance of categories.index
 	var start_time = new Date().getTime(); // Start time
