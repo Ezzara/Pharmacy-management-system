@@ -42,7 +42,7 @@ class AppServiceProvider extends ServiceProvider
 
                 if (strpos($query->sql, 'categories') !== false) {
                     Log::channel('querylog')->info(
-                        "Query: {$query->sql}, Values: " . implode(',', $query->bindings) . ", Time: {$query->time}ms"
+                        "Query: {$query->sql}, Time: {$query->time}ms"
                     );
                 }
             });

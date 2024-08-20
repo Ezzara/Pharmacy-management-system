@@ -45,8 +45,10 @@
 											<label for="quantity">Quantity:</label>
 											<input type="number" class="form-control" id="quantity">
 										</div>
+										<input type="hidden" name="print_receipt" id="print_receipt" value="no">
 										<button type="button" class="btn btn-primary" onclick="addProduct()">Add Product</button>
 										<button type="button" class="btn btn-primary" onclick="confirmOrder()"> Confirm Order </button>
+										
 									</form>
 								</div>
 							</div>
@@ -151,11 +153,14 @@
 			var form = document.getElementById('productForm');
 			form.appendChild(input);
 			// ask the user for confirmation
-			var answer = confirm('Are you sure you want to place this order?');
+			//var answer = confirm('Apakah anda ingin mencetak struk?');
 			// if the answer is true, submit the form
-			if (answer) {
-			form.submit();
-			}
+			//if (answer) {
+			//	form.submit();
+			//}
+			let printReceipt = confirm("Apakah anda ingin mencetak struk?");
+        	document.getElementById('print_receipt').value = printReceipt ? 'yes' : 'no';
+        	document.getElementById('productForm').submit();
 		}
     </script>
 @endpush

@@ -104,9 +104,6 @@ class SaleController extends Controller
         // decode the JSON string into an array
         $products = json_decode($productsJSON, true);
 
-
-
-
         // loop through the products array and do something with each product
         foreach ($products as $product) {
             $sold_product = Category::find($product['product']);
@@ -123,51 +120,55 @@ class SaleController extends Controller
                 'total_price'=>$total,
             ]);
         }
-        
-        try {
-
-            $connector = new WindowsPrintConnector("POS58 Printer");
-            $printer = new Printer($connector);
-            
-            // Print header
-            $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->text("APOTEK\n");
-            $printer->text("PADMASARI\n");
-            $printer->text("WA:0852-1318-6007\n");
-            $tid = $this->generateRandomNumericString();
-            // Print transaction details
-            $printer->setJustification(Printer::JUSTIFY_LEFT);
-            $printer->text("\n");
-            $printer->text("tid:{$tid}\n\n");
-            $total = 0;
-            foreach ($products as $product) {
-                $subtotal = 0;
-                $sold_product = Category::find($product['product']);
-                #abbr the product name
-                $abbreviation = $this->generateAcronym($sold_product->name);
-                $printer->text("{$abbreviation} \n");
-                $printer->setJustification(Printer::JUSTIFY_RIGHT);
-                $printer->text("{$product['quantity']} x Rp{$product['price']} = ");
-                $subtotal = $product['quantity'] * $product['price'];
-                $total = $total + $subtotal; 
-                $printer->text("Rp{$subtotal}\n");
+        $printReceipt = $request->input('print_receipt');
+        if($printReceipt === 'yes') {
+            try {
+                
+                $connector = new WindowsPrintConnector("POS58 Printer");
+                $printer = new Printer($connector);
+                
+                // Print header
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
+                $printer->text("APOTEK\n");
+                $printer->text("PADMASARI\n");
+                $printer->text("WA:0852-1318-6007\n");
+                $tid = $this->generateRandomNumericString();
+                // Print transaction details
                 $printer->setJustification(Printer::JUSTIFY_LEFT);
+                $printer->text("\n");
+                $printer->text("tid:{$tid}\n\n");
+                $total = 0;
+                foreach ($products as $product) {
+                    $subtotal = 0;
+                    $sold_product = Category::find($product['product']);
+                    #abbr the product name
+                    $abbreviation = $this->generateAcronym($sold_product->name);
+                    $printer->text("{$abbreviation} \n");
+                    $printer->setJustification(Printer::JUSTIFY_RIGHT);
+                    $printer->text("{$product['quantity']} x Rp{$product['price']} = ");
+                    $subtotal = $product['quantity'] * $product['price'];
+                    $total = $total + $subtotal; 
+                    $printer->text("Rp{$subtotal}\n");
+                    $printer->setJustification(Printer::JUSTIFY_LEFT);
+                }
+                // Print subtotal, tax, and total
+                $printer->setJustification(Printer::JUSTIFY_RIGHT);
+                $printer->text("Total: Rp{$total}\n\n");
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
+                // Print footer
+                $printer->text("Terima Kasih Telah Berbelanja!\n");
+            
+                // Cut the receipt
+                $printer->cut();
+            
+                // Close the printer connection
+                $printer->close();
+            } catch (Exception $e) {
+                // Handle any exceptions (e.g., printer not found)
+                echo "Error: " . $e->getMessage();
+ 
+                //return response()->json(['error' => $e->getMessage()], 500);
             }
-            // Print subtotal, tax, and total
-            $printer->setJustification(Printer::JUSTIFY_RIGHT);
-            $printer->text("Total: Rp{$total}\n\n");
-            $printer->setJustification(Printer::JUSTIFY_CENTER);
-            // Print footer
-            $printer->text("Terima Kasih Telah Berbelanja!\n");
-        
-            // Cut the receipt
-            $printer->cut();
-        
-            // Close the printer connection
-            $printer->close();
-        } catch (Exception $e) {
-            // Handle any exceptions (e.g., printer not found)
-            echo "Error: " . $e->getMessage();
         }
         return redirect()->route('sales.index');
     }

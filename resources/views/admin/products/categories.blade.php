@@ -156,5 +156,33 @@
         });
         //
     });
+	// QET of the first instance of categories.index
+	var start_time = new Date().getTime(); // Start time
+	$.ajax({
+			url: "{{route('categories.index')}}",
+			type: 'GET',
+			success: function(data) {
+				var request_time = new Date().getTime() - start_time;
+				console.log('Request Time: ' + request_time + 'ms');
+			}
+	});
+	// QET when search bar is used
+	$('#search-bar').on('input', function() {
+    var search_term = $(this).val();
+    var start_time = new Date().getTime(); // Start time
+
+    $.ajax({
+        url: '/search',
+        type: 'GET',
+        data: {
+            'search_term': search_term
+        },
+        success: function(data) {
+            var request_time = new Date().getTime() - start_time; // End time - Start time
+            console.log('Request Time: ' + request_time + 'ms'); // Log the request time
+            // Update your table with the search results
+        }
+    });
+});
 </script> 
 @endpush
