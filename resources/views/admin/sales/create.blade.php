@@ -29,37 +29,41 @@
 									<form id="productForm" action="{{ route('sales.store') }}" method="POST">
 										@csrf
 										<div class="form-group">
-											<label>Product <span class="text-danger">*</span></label>
-											<select class="select2 form-select form-control" name="product" id="product"> 
-												@foreach ($categories as $category)
-													@if (!empty($category->name))
-														@if (!($category->quantity <= 0))
-
-															<option value="{{$category->id}}" data-price="{{$category->price}}" data-stock="{{$category->quantity}}">{{$category->name}}</option>
+											<table class="table table-bordered" id="productTable">
+												<thead>
+													<tr>
+														<th>Product</th>
+														<th>Price</th>
+														<th>Stock</th>
+													</tr>
+												</thead>
+												<tbody>
+													@foreach ($categories as $category)
+														@if (!empty($category->name))
+															<tr data-id="{{$category->id}}" data-price="{{$category->price}}" data-stock="{{$category->quantity}}">
+																<td>{{$category->name}}</td>
+																<td>{{$category->price}}</td>
+																<td>{{$category->quantity}}</td>
+															</tr>
 														@endif
-													@endif
-												@endforeach
-											</select>
-										</div>
-										<div class="form-group">
-											<label for="quantity">Quantity:</label>
-											<input type="number" class="form-control" id="quantity">
+													@endforeach
+												</tbody>
+											</table>
 										</div>
 										<input type="hidden" name="print_receipt" id="print_receipt" value="no">
-										<button type="button" class="btn btn-primary" onclick="addProduct()">Add Product</button>
-										<button type="button" class="btn btn-primary" onclick="confirmOrder()"> Confirm Order </button>
 										
 									</form>
 								</div>
+
 							</div>
 						</div>
 						<div class="col-md-6">
 							<div class="card">
 								<div class="card-body">
 									<h5 class="card-title">Added Products</h5>
-									<ul id="productList" class="list-group">
-									</ul>
-									<h5 class="card-title mt-4">Total: <span id="total"></span></h5>
+									<ul id="productList" class="list-group"></ul>
+									<p>Total: <span id="total">0.00</span></p>
+									<button type="button" class="btn btn-primary" onclick="confirmOrder()"> Confirm Order </button>
 								</div>
 							</div>
 						</div>
@@ -73,65 +77,63 @@
 </div>
 @endsection	
 
-
 @push('page-js')
     <script>
-        var products = [];
+		var products = [];
 		var removedOptions = {};
 
-		function addProduct() {
-			var productSelect = document.getElementById('product');
-			var product = productSelect.value;
-			var productName = productSelect.options[productSelect.selectedIndex].text;
-			var quantity = parseFloat(document.getElementById('quantity').value);
-			var quantityInput = document.getElementById('quantity');
-			var price = parseFloat(productSelect.options[productSelect.selectedIndex].getAttribute('data-price'));
-			var stock = parseFloat(productSelect.options[productSelect.selectedIndex].getAttribute('data-stock'));
-			var productDetails = {product: product, quantity: quantity, price: price};
+		document.querySelectorAll('#productTable tbody tr').forEach(function(row) {
+			row.addEventListener('click', function() {
+				var product = this.getAttribute('data-id');
+				var productName = this.cells[0].textContent;
+				var price = parseFloat(this.getAttribute('data-price'));
+				var stock = parseFloat(this.getAttribute('data-stock'));
 
-			products.push(productDetails);
-
-			if (quantityInput.value === '') {
-				alert('Please enter a quantity');
-				return;
-   			}
-			if (quantity <= 0) {
-				alert('Quantity must be greater than 0');
-        	return;
-    		}
-			if (quantity > stock ) {
-				alert('Stock obat kurang')
-				return;
-			}
-
-			var li = document.createElement('li');
-			li.textContent = productName + ' x ' + quantity + ' = ' + (quantity * price).toFixed(2);
-			li.className = 'list-group-item';
-			//contain the removed product and then remove it from the input
-			removedOptions[product] = productSelect.options[productSelect.selectedIndex];
-			productSelect.remove(productSelect.selectedIndex);
-			document.getElementById('quantity').value = "";
-
-			var removeButton = document.createElement('button');
-			removeButton.textContent = 'Remove';
-			removeButton.className = 'btn btn-danger btn-sm float-right';
-			removeButton.onclick = function() {
-				var index = products.indexOf(productDetails);
-				if (index !== -1) {
-					products.splice(index, 1);
+				var quantity = prompt('Please enter the quantity:');
+				if (quantity === null) {
+					return; // User cancelled the prompt
 				}
-				li.parentNode.removeChild(li);
+				quantity = parseFloat(quantity);
+
+				if (isNaN(quantity) || quantity <= 0) {
+					alert('Quantity must be a positive number');
+					return;
+				}
+				if (quantity > stock) {
+					alert('Stock obat kurang');
+					return;
+				}
+
+				var productDetails = {product: product, quantity: quantity, price: price};
+				products.push(productDetails);
+
+				var li = document.createElement('li');
+				li.textContent = productName + ' x ' + quantity + ' = ' + (quantity * price).toFixed(2);
+				li.className = 'list-group-item';
+
+				removedOptions[product] = this;
+				this.style.display = 'none';
+
+				var removeButton = document.createElement('button');
+				removeButton.textContent = 'Remove';
+				removeButton.className = 'btn btn-danger btn-sm float-right';
+				removeButton.onclick = function() {
+					var index = products.indexOf(productDetails);
+					if (index !== -1) {
+						products.splice(index, 1);
+					}
+					li.parentNode.removeChild(li);
+					calculateTotal();
+
+					var row = removedOptions[productDetails.product];
+					row.style.display = '';
+				};
+
+				li.appendChild(removeButton);
+				document.getElementById('productList').appendChild(li);
 				calculateTotal();
-
-				var productSelect = document.getElementById('product');
-				var option = removedOptions[productDetails.product];
-				productSelect.add(option);
-			};
-
-			li.appendChild(removeButton);
-			document.getElementById('productList').appendChild(li);
-			calculateTotal();
-		}
+			});
+		});
 
 		function calculateTotal() {
 			var total = 0;
@@ -142,25 +144,17 @@
 		}
 
 		function confirmOrder() {
-			// get the products array as a JSON string
 			var productsJSON = JSON.stringify(products);
-			// create a hidden input element to store the products data
 			var input = document.createElement('input');
 			input.type = 'hidden';
 			input.name = 'products';
 			input.value = productsJSON;
-			// append the input element to the form
 			var form = document.getElementById('productForm');
 			form.appendChild(input);
-			// ask the user for confirmation
-			//var answer = confirm('Apakah anda ingin mencetak struk?');
-			// if the answer is true, submit the form
-			//if (answer) {
-			//	form.submit();
-			//}
+
 			let printReceipt = confirm("Apakah anda ingin mencetak struk?");
-        	document.getElementById('print_receipt').value = printReceipt ? 'yes' : 'no';
-        	document.getElementById('productForm').submit();
+			document.getElementById('print_receipt').value = printReceipt ? 'yes' : 'no';
+			document.getElementById('productForm').submit();
 		}
     </script>
 @endpush

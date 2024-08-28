@@ -85,7 +85,10 @@ class SaleController extends Controller
     public function create()
     {
         $title = 'create sales';
-        $categories = Category::get();
+        // find any product that has a price
+        $categories = DB::table('categories')
+                       // ->where('price','>',0)
+                        ->get();
         return view('admin.sales.create',compact(
             'title','categories'
         ));
@@ -323,6 +326,16 @@ class SaleController extends Controller
         }
     
         return implode(' ', $result);
+    }
+
+    public function getCategories()
+    {
+        $categories = Category::select(['id', 'name', 'price', 'quantity']);
+        return DataTables::of($categories)
+            ->addColumn('action', function ($category) {
+                return '<button class="btn btn-primary btn-sm" onclick="addProduct(' . $category->id . ')">Add</button>';
+            })
+            ->make(true);
     }
 
 }

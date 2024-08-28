@@ -68,6 +68,9 @@ Route::middleware(['auth'])->group(function(){
     Route::delete('backup/delete/{file_name?}', [BackupController::class,'destroy'])->where('file_name', '(.*)')->name('backup.destroy');
 
     Route::get('settings',[SettingController::class,'index'])->name('settings');
+
+    //get categories for create sale
+    Route::get('categories', [SalesController::class, 'getCategories'])->name('sales.list');
 });
 
 Route::middleware(['guest'])->group(function () {
