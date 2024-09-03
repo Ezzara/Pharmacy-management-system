@@ -70,7 +70,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('settings',[SettingController::class,'index'])->name('settings');
 
     //get categories for create sale
-    Route::get('categories', [SalesController::class, 'getCategories'])->name('sales.list');
+    Route::get('sale_categories', [SaleController::class, 'getCategories'])->name('sales.list');
 });
 
 Route::middleware(['guest'])->group(function () {

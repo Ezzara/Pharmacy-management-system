@@ -1,5 +1,6 @@
 @extends('admin.layouts.app')
 
+<x-assets.datatables />
 
 @push('page-css')
     
@@ -20,7 +21,6 @@
 	<div class="col-sm-12">
 		<div class="card">
 			<div class="card-body custom-edit-service">
-				<div class="container">
 					<h2 class="text-center mt-4">Cashier Panel</h2>
 					<div class="row form-row">
 						<div class="col-md-6">
@@ -32,29 +32,17 @@
 											<table class="table table-bordered" id="productTable">
 												<thead>
 													<tr>
-														<th>Product</th>
-														<th>Price</th>
+														<th>Nama Obat</th>
+														<th>Harga</th>
 														<th>Stock</th>
+                                                        <th>Tgl expired</th>
 													</tr>
 												</thead>
-												<tbody>
-													@foreach ($categories as $category)
-														@if (!empty($category->name))
-															<tr data-id="{{$category->id}}" data-price="{{$category->price}}" data-stock="{{$category->quantity}}">
-																<td>{{$category->name}}</td>
-																<td>{{$category->price}}</td>
-																<td>{{$category->quantity}}</td>
-															</tr>
-														@endif
-													@endforeach
-												</tbody>
 											</table>
 										</div>
 										<input type="hidden" name="print_receipt" id="print_receipt" value="no">
-										
 									</form>
 								</div>
-
 							</div>
 						</div>
 						<div class="col-md-6">
@@ -68,9 +56,6 @@
 							</div>
 						</div>
 					</div>
-				</div>
-
-
 			</div>
 		</div>
 	</div>			
@@ -78,83 +63,89 @@
 @endsection	
 
 @push('page-js')
-    <script>
-		var products = [];
-		var removedOptions = {};
+<script>
+    $(document).ready(function() {
+        $('#productTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{{ route('sales.list') }}',
+            columns: [
+                { data: 'name', name: 'name' },
+                { data: 'price', name: 'price' },
+                { data: 'quantity', name: 'quantity' },
+                { data: 'expiry_date',name:'expiry_date'},
+            ],
+            pageLength: 100,
+            scrollY: '500px',
+            scrollCollapse: true
+        });
 
-		document.querySelectorAll('#productTable tbody tr').forEach(function(row) {
-			row.addEventListener('click', function() {
-				var product = this.getAttribute('data-id');
-				var productName = this.cells[0].textContent;
-				var price = parseFloat(this.getAttribute('data-price'));
-				var stock = parseFloat(this.getAttribute('data-stock'));
+        var products = [];
+        var removedOptions = {};
 
-				var quantity = prompt('Please enter the quantity:');
-				if (quantity === null) {
-					return; // User cancelled the prompt
-				}
-				quantity = parseFloat(quantity);
+        $('#productTable tbody').on('click', 'tr', function() {
+            var row = $('#productTable').DataTable().row(this).data();
+            var productId = row.id;
+            var productName = row.name;
+            var price = parseFloat(row.price);
+            var stock = parseFloat(row.quantity);
 
-				if (isNaN(quantity) || quantity <= 0) {
-					alert('Quantity must be a positive number');
-					return;
-				}
-				if (quantity > stock) {
-					alert('Stock obat kurang');
-					return;
-				}
+            var quantity = prompt('Please enter the quantity for ' + productName + ':');
+            if (quantity === null) {
+                return; // User cancelled the prompt
+            }
+            quantity = parseFloat(quantity);
 
-				var productDetails = {product: product, quantity: quantity, price: price};
-				products.push(productDetails);
+            if (isNaN(quantity) || quantity <= 0) {
+                alert('Quantity must be a positive number');
+                return;
+            }
+            if (quantity > stock) {
+                alert('Stock obat kurang');
+                return;
+            }
 
-				var li = document.createElement('li');
-				li.textContent = productName + ' x ' + quantity + ' = ' + (quantity * price).toFixed(2);
-				li.className = 'list-group-item';
+            var productDetails = {product: productId, quantity: quantity, price: price};
+            products.push(productDetails);
 
-				removedOptions[product] = this;
-				this.style.display = 'none';
+            var li = $('<li>').text(productName + ' x ' + quantity + ' = ' + (quantity * price).toFixed(2)).addClass('list-group-item');
 
-				var removeButton = document.createElement('button');
-				removeButton.textContent = 'Remove';
-				removeButton.className = 'btn btn-danger btn-sm float-right';
-				removeButton.onclick = function() {
-					var index = products.indexOf(productDetails);
-					if (index !== -1) {
-						products.splice(index, 1);
-					}
-					li.parentNode.removeChild(li);
-					calculateTotal();
+            removedOptions[productId] = row;
+            $('#productTable').DataTable().row(this).remove().draw();
 
-					var row = removedOptions[productDetails.product];
-					row.style.display = '';
-				};
+            var removeButton = $('<button>').text('Remove').addClass('btn btn-danger btn-sm float-right').click(function() {
+                var index = products.indexOf(productDetails);
+                if (index !== -1) {
+                    products.splice(index, 1);
+                }
+                li.remove();
+                calculateTotal();
 
-				li.appendChild(removeButton);
-				document.getElementById('productList').appendChild(li);
-				calculateTotal();
-			});
-		});
+                $('#productTable').DataTable().row.add(removedOptions[productDetails.product]).draw();
+            });
 
-		function calculateTotal() {
-			var total = 0;
-			for (var i = 0; i < products.length; i++) {
-				total += products[i].quantity * products[i].price;
-			}
-			document.getElementById('total').textContent = total.toFixed(2);
-		}
+            li.append(removeButton);
+            $('#productList').append(li);
+            calculateTotal();
+        });
 
-		function confirmOrder() {
-			var productsJSON = JSON.stringify(products);
-			var input = document.createElement('input');
-			input.type = 'hidden';
-			input.name = 'products';
-			input.value = productsJSON;
-			var form = document.getElementById('productForm');
-			form.appendChild(input);
+        function calculateTotal() {
+            var total = 0;
+            for (var i = 0; i < products.length; i++) {
+                total += products[i].quantity * products[i].price;
+            }
+            $('#total').text(total.toFixed(2));
+        }
 
-			let printReceipt = confirm("Apakah anda ingin mencetak struk?");
-			document.getElementById('print_receipt').value = printReceipt ? 'yes' : 'no';
-			document.getElementById('productForm').submit();
-		}
-    </script>
+        window.confirmOrder = function() {
+            var productsJSON = JSON.stringify(products);
+            var input = $('<input>').attr('type', 'hidden').attr('name', 'products').val(productsJSON);
+            $('#productForm').append(input);
+
+            let printReceipt = confirm("Apakah anda ingin mencetak struk?");
+            $('#print_receipt').val(printReceipt ? 'yes' : 'no');
+            $('#productForm').submit();
+        }
+    });
+</script>
 @endpush

@@ -176,6 +176,22 @@
         }
     @endif
 </script>
+
+<!-- adding shortcut key-->
+<script>
+    //shortcut key to product list
+    document.addEventListener('keydown', function(event) {
+            if (event.key === 'F8') {
+                window.location.href = "{{ route('categories.index') }}";
+            }
+        });
+    //shortcut key to cashier
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'F9') {
+            window.location.href = "{{ route('sales.create') }}";
+        }
+    });
+</script>
 <!-- Page JS -->
 @stack('page-js')
 </html>

@@ -173,7 +173,7 @@ class SaleController extends Controller
                 //return response()->json(['error' => $e->getMessage()], 500);
             }
         }
-        return redirect()->route('sales.index');
+        return redirect()->route('sales.create');
     }
 
     
@@ -330,10 +330,21 @@ class SaleController extends Controller
 
     public function getCategories()
     {
-        $categories = Category::select(['id', 'name', 'price', 'quantity']);
+        \Log::info('getCategories method called');
+        
+        //$categories = Category::select(['id', 'name', 'price', 'quantity']);
+        $categories = DB::table('categories')
+                        ->where('price','>',0)
+                        ->get();
+        
         return DataTables::of($categories)
-            ->addColumn('action', function ($category) {
-                return '<button class="btn btn-primary btn-sm" onclick="addProduct(' . $category->id . ')">Add</button>';
+            ->addcolumn('expiry_date',function($category){
+                $exp = $category->expiry_date;
+                if (!$category->expiry_date)
+                    $exp = "-";
+                else
+                    $exp = date_format(date_create($exp),"d M,Y");
+                return $exp;
             })
             ->make(true);
     }

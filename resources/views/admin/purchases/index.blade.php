@@ -63,7 +63,10 @@
                 {data: 'quantity', name: 'quantity'},
 				{data: 'expiry_date', name: 'expiry_date'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
-            ]
+            ],
+			pageLength: 100,
+            scrollY: '500px',
+            scrollCollapse: true
         });
         
     });

@@ -136,6 +136,8 @@
 				}
 			},
 			pageLength: 100,
+            scrollY: '500px',
+            scrollCollapse: true,
             columns: [
                 {data: 'name', name: 'name'},
 				{data: 'price',name:'price'},
@@ -143,9 +145,6 @@
 				{data: 'expiry_date',name:'expiry_date'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
-			//data: function (d) {
-			//	d.stock_status = $('#stock_status').val();
-			//}
         });
         $('#category-table').on('click','.editbtn',function (){
             $('#edit_category').modal('show');

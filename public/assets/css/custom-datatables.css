@@ -1,17 +1,17 @@
 /* Resize font for all DataTables */
 .dataTables_wrapper {
-    font-size: 10px !important; /* Adjust the font size as needed */
+    font-size: 12px !important; /* Adjust the font size as needed */
 
 }
 
 /* Resize font for table headers */
 .dataTables_wrapper th {
-    font-size: 12px !important; /* Adjust the font size as needed */
+    font-size: 14px !important; /* Adjust the font size as needed */
     font-weight: bold !important;
 }
 
 /* Resize font for table cells */
 .dataTables_wrapper td {
-    font-size: 11px !important; /* Adjust the font size as needed */
+    font-size: 13px !important; /* Adjust the font size as needed */
     padding : 0.4rem !important;
 }

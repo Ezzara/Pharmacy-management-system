@@ -67,7 +67,10 @@
                 {data: 'total_price', name: 'total_price'},
 				{data: 'date', name: 'date'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
-            ]
+            ],
+			pageLength: 100,
+            scrollY: '500px',
+            scrollCollapse: true
         });
         
     });
